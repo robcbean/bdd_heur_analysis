@@ -1,0 +1,296 @@
+typedef unsigned int uint32_t;
+
+
+
+#include "mtrInt.h"
+#include "cuddObj.hh"
+#include "output.h"
+#include "operations.h"
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <vector>
+#include <iostream>
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+void timeOut()
+{
+  std::vector<BDD> output;
+  Cudd mgr(0,0);
+  print_output(16,"root","FORCE\tCUDD_REORDER_SIFT\t-1.0\t-1.0\t7\t75.0\t4.0	6.0	2.0	87.5	17.67766952966369	87.5",mgr,output,false,NULL,true);
+}
+
+
+int main( int argc, char **argv )
+{
+
+  Cudd mgr(4,0);
+  
+    mgr.AutodynDisable();
+  
+  double nodes_before=0;
+  BDD x[16];
+  double t1,t2,t3,t4;
+  double  desc_t1=0,desc_t2=0,desc_t3=0,desc_t4=0,desc_t5=0;
+  double  sum_nodes=0;
+  DdNode* poutput[2];
+  DdNode* ptotal[1];
+  std::string str_output;
+  char buffer[100];
+  std::string grown="";
+  std::string symmetric =  "";
+  std::string symmetric_after = "";
+  double minTerms=0;
+
+  //Timeout process control
+  pid_t child_pid = fork();
+  pid_t parent_pid = getpid();
+  int status;
+  if( child_pid != 0 )
+  {
+    sleep(600);
+    timeOut();
+    kill(child_pid,SIGTERM);
+    exit(0);
+  }
+
+  //Output nodes
+  std::vector<BDD> output(2);
+  std::vector<BDD> count_nodes_vector;
+  std::vector<unsigned long> count_nodes;
+  std::vector<unsigned long> count_id;
+
+  for(unsigned int i=0; i<2;i++)
+  {
+    output[i] = mgr.bddOne();
+  }
+
+
+  //Variables
+
+  x[1]=mgr.bddVar(0); //0 man1
+
+  x[0]=mgr.bddVar(1); //1 root
+
+  x[3]=mgr.bddVar(3); //3 op2
+
+  x[2]=mgr.bddVar(2); //2 op1
+
+
+  //Outputs
+	output[0]=mgr.bddOne();
+	output[1]=mgr.bddOne();
+
+
+
+
+
+
+
+
+
+  //Gates
+  std::cerr<<"Generating bdd ..."<<std::endl;
+  t1 = get_user_time();
+  		
+	std::cerr<<"processing gate 6..."<<std::endl;
+	x[6] = (!x[1]|x[0])&(!x[0]|x[1]);// and (not _r_1 or _r) and (not _r or _r_1) 
+	count_nodes_vector.push_back(x[6]);
+	count_nodes.push_back(mgr.SharingSize(count_nodes_vector));
+	count_id.push_back(6);
+	std::cerr<<"Appending gate to output[0] x[6]"<<std::endl;
+	output[0]=output[0] & x[6];
+	
+	std::cerr<<"processing gate 8..."<<std::endl;
+	x[8] = (!x[2]|x[0]);// and (not _r_2 or _r) 
+	count_nodes_vector.push_back(x[8]);
+	count_nodes.push_back(mgr.SharingSize(count_nodes_vector));
+	count_id.push_back(8);
+	std::cerr<<"Appending gate to output[0] x[8]"<<std::endl;
+	output[0]=output[0] & x[8];
+	
+	std::cerr<<"processing gate 10..."<<std::endl;
+	x[10] = (!x[3]|x[0]);// and (not _r_3 or _r) 
+	count_nodes_vector.push_back(x[10]);
+	count_nodes.push_back(mgr.SharingSize(count_nodes_vector));
+	count_id.push_back(10);
+	std::cerr<<"Appending gate to output[0] x[10]"<<std::endl;
+	output[0]=output[0] & x[10];
+	
+	std::cerr<<"processing gate 5..."<<std::endl;
+	x[5] = (x[0]);//(_r) 
+	count_nodes_vector.push_back(x[5]);
+	count_nodes.push_back(mgr.SharingSize(count_nodes_vector));
+	count_id.push_back(5);
+	std::cerr<<"Appending gate to output[0] x[5]"<<std::endl;
+	output[0]=output[0] & x[5];
+		
+	std::cerr<<"processing gate 14..."<<std::endl;
+	x[13] = !x[1]|!x[2];//not _r_1 or not _r_2
+	count_nodes_vector.push_back(x[13]);
+	count_nodes.push_back(mgr.SharingSize(count_nodes_vector));
+	count_id.push_back(14);
+	std::cerr<<"Appending gate to output[1] x[13]"<<std::endl;
+	output[1]=output[1] & x[13];
+	
+	std::cerr<<"processing gate 15..."<<std::endl;
+	x[14] = x[2]|x[3];// _r_2 or _r_3
+	count_nodes_vector.push_back(x[14]);
+	count_nodes.push_back(mgr.SharingSize(count_nodes_vector));
+	count_id.push_back(15);
+	std::cerr<<"Appending gate to output[1] x[14]"<<std::endl;
+	output[1]=output[1] & x[14];
+	//Null Function
+	x[12] = mgr.bddOne();
+
+	desc_t1 = get_user_time();
+
+	mgr.AutodynDisable();
+	x[12] = x[12] & output[0];
+
+	poutput[0] = output[0].getNode();
+
+	x[12] = x[12] & output[1];
+
+	poutput[1] = output[1].getNode();
+
+  t2 = get_user_time();
+  
+  t4 = get_diftime(t1,t2);
+
+  
+  s_rootBDD =  x[12].getNode();
+  
+
+
+  
+    
+    
+      t1 = get_user_time();
+      std::cerr<<"Reducing heap order FORCE reorder CUDD_REORDER_SIFT ..."<<std::endl;
+      nodes_before = Cudd_DagSize(x[12].getNode());
+      //std::cerr<<"Nodes before reduce heap:"<<nodes_before<<std::endl;
+      //mgr.ReduceHeap(CUDD_REORDER_SIFT);
+      t2 = get_user_time();
+      t3 = get_diftime(t1,t2);
+      
+    
+  
+
+  
+    ptotal[0] = x[12].getNode();
+    std::cerr<<"Calculating dead_core complete .."<<std::endl;
+    desc_t1 = get_user_time();
+    feature_model_info* info2 = calc_dead_core_and_impact_exclusion_only_one(mgr.getManager(), ptotal[0], 4);
+    desc_t2 = get_user_time();
+    desc_t5 = get_diftime(desc_t1,desc_t2);
+
+
+    desc_t2 = get_user_time();
+    desc_t3 = get_diftime(desc_t1,desc_t2);
+    desc_t1 = get_user_time();
+    std::cerr<<"Calculating dead and core..."<<std::endl;
+    feature_model_info* info1 =calc_dead_core_and_impact_exclusion(mgr.getManager(), poutput, 2, 4);
+    desc_t2 = get_user_time();
+    desc_t4 = get_diftime(desc_t1,desc_t2);
+
+
+    feature_model_info** pinfo = new feature_model_info*[3];
+    for(int i=0; i< 2;i++)
+    {
+    std::cerr<<"Calculation dead core function "<<i<<std::endl;
+    pinfo[i] = calc_dead_core_and_impact_exclusion_only_one(mgr.getManager(), output[i].getNode(), 4);
+    }
+
+
+    for(int i=0; i < 2; i++){
+    unsigned int nodes = Cudd_DagSize(poutput[i]);
+    sum_nodes = sum_nodes + nodes;
+    std::cerr<<"Nodes output["<<i<<"] = "<<nodes<<std::endl;
+    }
+
+    unsigned int core=0,dead=0;
+    for(unsigned int i=0;i<4;i++)
+    {
+    if(info2->var_low[i] == 1 && info2->var_high[i] == 0 )
+    {
+    dead = dead + 1;
+    }
+    if(info2->var_low[i] == 0 && info2->var_high[i] == 1 )
+    {
+    core = core + 1;
+    }
+    fprintf(stderr,"dead_core:%d\tinfo2:[%d,%d] info1: [%d,%d] ",i,info2->var_low[i],info2->var_high[i],info1->var_low[i],info1->var_high[i]);
+    for(unsigned int j=0; j<2;j++)
+    {
+    fprintf(stderr,"\tfunction(%d): [%d,%d]",j,pinfo[j]->var_low[i],pinfo[j]->var_high[i]);
+    }
+    if( info2->var_low[i] != info1->var_low[i] || info2->var_high[i] != info1->var_high[i] )
+    fprintf(stderr,"\t****");
+    fprintf(stderr,"\n");
+    }
+    fprintf(stderr,"Dead features: %u\n",dead);
+    fprintf(stderr,"Core features: %u\n",core);
+  
+
+
+  //Calc minterms at end
+  minTerms =  x[12].CountMinterm(4);
+
+
+
+   
+      sprintf(buffer,"%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g",t4,t3,desc_t3,desc_t5,desc_t5+desc_t3,desc_t4,sum_nodes,minTerms);
+   
+
+
+
+  
+
+
+
+
+  str_output = "FORCE	CUDD_REORDER_SIFT	";
+  str_output = str_output + "\t" + buffer + "\t7\t75.0\t4.0	6.0	2.0	87.5	17.67766952966369	87.5";
+  
+  print_output(16,"root",str_output,mgr,output,true,&(x[12]),true);
+  writeSize("growth.txt", "root", "FORCE",count_nodes,count_id);
+
+  
+  std::vector<BDD> dot_vector(2);
+  
+    dot_vector[0] = output[0];
+  
+    dot_vector[1] = output[1];
+  
+  FILE *fd = fopen("root.dot","w");
+  mgr.DumpDot(dot_vector,NULL,NULL,fd);
+  fclose(fd);
+  std::vector<BDD> dot_vector_total(1);
+  dot_vector_total[0] =   x[12];
+  fd = fopen("root_complete.dot","w");
+  mgr.DumpDot(dot_vector_total,NULL,NULL,fd);
+  fclose(fd);
+  //<< ROB : 08/07/2018 Write also all extra information
+  for(unsigned int j=0;j<2;j++)
+  {
+    std::vector<BDD> func_vector(1);
+    func_vector[0] = output[j];
+    sprintf(buffer,"%d.dot",j);
+    fd = fopen(buffer,"w");
+    mgr.DumpDot(func_vector,NULL,NULL,fd);
+    fclose(fd);
+  }
+  
+
+
+
+
+  kill(getppid(),SIGKILL);
+  int status_parent;
+  wait(&status_parent);
+  exit(0);
+
+}

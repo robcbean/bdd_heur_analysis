@@ -1,0 +1,110 @@
+
+
+
+
+
+<%
+    def getVarNum(_var_list,_variable)
+      ret = -1
+      ret = _var_list.find_index(_variable)
+      return ret
+    end
+%>
+
+
+
+
+int main( int argc, char **argv )
+{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //<%=heur.name%>  sorting
+  std::cerr<<"Setting order <%=heur.name%> ..."<<std::endl;
+  <%if heur.reorder == ""%>
+      <% if not calc_desc %>
+  sprintf(buffer,"%g\t%g\t%g",t4,0.0,minTerms);
+      <% else %>
+  sprintf(buffer,"%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g",t4,0.0,desc_t3,desc_t5,desc_t5+desc_t3,desc_t4,sum_nodes,minTerms);
+      <% end %>
+    <%else%>
+      <% if not calc_desc %>
+  sprintf(buffer,"%g\t%g",t4,0.0);
+      <%else%>
+   sprintf(buffer,"%g\t%g\t%g\t%g\t%g",t4,0.0,desc_t3,desc_t5,desc_t5+desc_t3,desc_t4,sum_nodes);
+      <%end%>
+  <%end%>
+  <%end%>
+
+  <% if _avg_length_path %>
+    double avg_length;
+    DdNode* tmpnode;
+    std::cerr<<"Calculating average path length ..."<<std::endl;
+    for( int i=0; i<output.size();i++)
+    {
+    tmpnode = output[i].getNode();
+    avg_length = averagePathLenToNonZero(tmpnode);
+    std::cerr<<"Average path length:"<<i<<" "<<avg_length<<std::endl;
+    }
+    tmpnode = x[<%=getVarNum(circuit.var_list,circuit.getNullFunction)%>].getNode();
+    avg_length = averagePathLenToNonZero(tmpnode);
+    std::cerr<<"Average path length total: "<<avg_length<<std::endl;
+  <% end %>
+
+
+
+
+
+  <%if printMinters %>
+      <%if circuit.type != "BENCH"%>
+  minTerms =  x[<%=getVarNum(circuit.var_list,circuit.getNullFunction)%>].CountMinterm(<%=circuit.dfs_inputs.size%>);
+      <%else%>
+  minTerms = 0;
+      <%end%>
+      <% if not calc_desc %>
+  sprintf(buffer,"%g\t%g\t%g",t4,t3,minTerms);
+      <%else%>
+        sprintf(buffer,"%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g",t4,t3,desc_t3,desc_t5,desc_t5+desc_t3,desc_t4,sum_nodes,minTerms);
+       <%end%>
+  <%else%>
+      <% if not calc_desc %>
+  sprintf(buffer,"%g\t%g",t4,t3);
+     <%else%>
+  sprintf(buffer,"%g\t%g\t%g\t%g\t%g",t4,t3,desc_t3,desc_t5,desc_t5+desc_t3,desc_t4,sum_nodes);
+     <%end%>
+  <%end%>
+
+
+
+
+  str_output = "<%="#{heur.print_name}\t#{reorder}\t#{cpu_time[heur.name]}"%>";
+  str_output = str_output + "\t" + buffer + "\t<%=span[heur.name]%>\t<%=circuit.extra_info.ecr%>\t<%=FunctionInfo.new(circuit).to_s%>";
+  <%if count_symmetric %>
+  str_output = str_output + "\t" + symmetric + "\t" + symmetric_after;
+  <%end%>
+
+
+  print_output(<%=circuit.var_list.size()%>,"<%=circuit.name%>",str_output, mgr,output,true,&(x[<%=getVarNum(circuit.var_list,circuit.getNullFunction)%>]),<%=calcTotal(circuit)%>);
+  writeSize("<%=grown_file%>","<%=circuit.name%>","<%=heur.name%>",count_nodes,count_id);
+  <%end%>
+
+
+  <%if printMinters and circuit.type != "BENCH" %>
+  std::cerr<<"minterms (CUDD):"<<x[<%=getVarNum(circuit.var_list,circuit.getNullFunction)%>].CountMinterm(<%=circuit.dfs_inputs.size%>)<<std::endl;
+  <%end%>
+
+
+}
+

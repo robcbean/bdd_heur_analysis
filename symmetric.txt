@@ -1,0 +1,60 @@
+Group:  136  137  138  139  140  141  142  143  144
+Group:  169  170
+Group:  162  163
+Group:  123  124
+Group:  1  2  3  4
+Group:  5  6
+Group:  10  11  12  13  14
+Group:  7  8
+Group:  15  16
+Group:  19  20
+Group:  190  191  192
+Group:  91  92
+Group:  89  90
+Group:  25  26
+Group:  17  18
+Group:  27  28
+Group:  31  32
+Group:  33  34
+Group:  61  62
+Group:  38  39
+Group:  41  42
+Group:  44  45
+Group:  46  47
+Group:  55  56
+Group:  49  50  51
+Group:  63  64  65
+Group:  81  82
+Group:  79  80
+Group:  85  86  87  88
+Group:  99  100
+Group:  104  105
+Group:  109  110  111
+Group:  112  113
+Group:  114  115
+Group:  119  120
+Group:  121  122
+Group:  126  127  128
+Group:  146  147  148  149  150  151  152
+Group:  154  155
+Group:  179  180  181  182  183  184
+Group:  176  177  178
+Group:  185  186
+Group:  204  205  206  207  208
+Group:  210  211
+Group:  214  215
+Group:  219  220
+Group:  226  227  228
+Group:  235  236
+Group:  229  230  231  232
+Group:  240  241
+Group:  238  239
+Group:  243  244
+Group:  69  70  71  72  73  74  75  76  77
+Group:  248  249  250
+Group:  251  252
+Group:  254  255  256  257
+Group:  258  259
+Group:  130  131
+Total Symmetric = 161
+Total Groups = 58
